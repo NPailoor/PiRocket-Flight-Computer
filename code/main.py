@@ -20,6 +20,8 @@ zScale = 7.271006
 # Number of digits to round to for g-force data:
 gForcePrecision = 5 
 
+#File writing package
+import pickle
 
 def setup():
 	# Create an ADC instance at the preconfigured address using the ADS1115 settting (our ADC)
@@ -27,12 +29,19 @@ def setup():
 	accelADC = ADS1x15( address=ADDRESS_ADS1115, ic=ADS1x15._ADS1x15__IC_ADS11155 )
 
 def main():
+	output = open('output.txt', 'ab+')
 	while True:
-		# Spit it out to the console:
-			print( str( getXAccel() ) + ",  \t" +
-			       str( getYAccel() ) + ",  \t" +
-		               str( getZAccel() ) + ",  \t" )
+		pickle.dump(mapData(), output)
+		
 
+
+def mapData():
+	xAccel = getXAccel()
+	yAccel = getYAccel()
+	zAccel = getZAccel()
+	time = getTime()
+	data = dict('xData':(xAccel, time), 'yData':(yAccel, time), 'zData':(zAccel, time))
+	return data
 
 def getXAccel():
 	xRaw = accelADC.readADCSingleEnded( channel=1, pga=4096, sps=50 )
